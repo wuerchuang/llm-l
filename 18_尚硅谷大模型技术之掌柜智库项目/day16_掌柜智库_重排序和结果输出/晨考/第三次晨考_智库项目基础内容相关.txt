@@ -1,0 +1,46 @@
+10分钟
+
+1. 简单说明 LangGraph 中 State类型和区别? 
+      全局		任何位置都可以使用   传入参数 中间节点 输出节点
+      context   上下文类型  只读模型 不能修改
+      input     传入参数的格式
+      output    输出结果的格式
+2. 写出pathlib的Path对象5个属性和5个函数以及说出其含义!
+      5个属性: name  stem  suffix  parent parents 
+      5个函数: is_file  is_dif  mkdir  read_bytes read_text write_bytes write_text  iterdir  glob  rglob "**/"  rename  with_name
+3. 正则中match/search/finditer/findall/escape函数的作用! 以及什么贪婪和非贪婪匹配的区别?
+      解释: 
+         import re 
+         方法1: 1. 先编译 编译好的正则对象 .  re.compile("正则规则")  2.再使用  编译好的正则对象 . match(传入要匹配的内容)  [推荐]
+         方法2: 不编译 直接使用  re.match ( "正则规则"  , 匹配的内容 )
+      函数:
+         match("1")  -> 从头开始匹配 -> 文档的标题匹配
+         search()    -> 任意位置的第一个					-> Match  .group() .start() .end()
+         finditer()  -> 所有匹配项 
+
+         findall()   -> 所有匹配内容
+         escape("xxx . [ (") -> \.
+      贪婪:
+         ? -> 非贪婪    第一个结束			"A(.*?)B" -> A123B -> () -> 123
+         			A123B456B
+         不加? -> 贪婪  最后一个结束          "A(.*)B" -> A123B456B -> 123B456
+
+4. MinerU 的核心用途，以及具体的使用步骤!
+5. MinIO主要的作用是什么? 9001和9000端口的区别? 以及写出查找/删除/上传文件对应的函数!
+     9001 -> 管理页面
+     9000 -> 操作minio端口
+
+     端点 / 桶名 / 对象名 -> 协议 + 端点9000 + 桶名 + 对象名 -> 对象名 /图片的前缀 + /文件名 + / 图片名 
+
+     查找 list[Object] = minio.list_objects(bucket_name,prefix="/图片的前缀 + /文件名")
+     删除 minio.delete_objects(bucket_name,delete_objects=[DeleteObject(obj.object_name) for obj in  list[Object]])
+     上传 minio.put/fput(bucket_name,object_name, put data | fput file_path , content_type=guess_type(.name)[0])
+     地址 自己匹配 minio Infra...
+
+6. HTTP协议中如何选择请求方式GET/POST/PUT/DELETE?  以及写出requests函数的参数和返回值!
+     
+     是不是需要请求体: 字节数据 大于2kb文本 隐私文本  
+     请求动作: 删除 delete  查找 get  (没有请求体) | params -> 筛选条件 path -> 唯一标识 |  上传 post 更新 put
+
+     response =  requests. get post put delete(url,params,json,data,headers,timeout)
+     response.status_code / json() [content text -> @property]

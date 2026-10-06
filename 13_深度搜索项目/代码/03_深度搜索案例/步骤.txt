@@ -1,0 +1,26 @@
+
+
+ 1. 导入依赖
+ 2. 搭建项目结构
+      agent
+      api
+      tools
+      utils
+      .env
+3. api中的三个py粘贴进来
+     server
+     context
+     monitor
+4. 粘贴两个工具类utils
+5. 准备.env文件
+6. 导入yaml配置和加载配置
+    prompt / prompts.yaml
+    agent / load_prompt.py -> 🦀🦀
+7. 定义子智能体
+   ragflow的文档地址
+   https://ragflow.io/docs/python_api_reference#parse-documents   [api使用]
+   https://ragflow.io/docs/parser_component [解释内部怎么解析文档]
+   镜像资料\ragflow-main\ragflow-main\deepdoc\parser
+   7.1 网络搜索
+   7.2 数据搜索
+   7.3 ragflow搜索

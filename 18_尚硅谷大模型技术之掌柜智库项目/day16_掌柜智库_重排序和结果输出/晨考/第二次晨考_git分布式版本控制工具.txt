@@ -1,0 +1,53 @@
+10分钟
+
+1. Git 本地有三大区域，请写出对应切换、查看状态的全套相关命令，并说明三个区域分别是什么。
+    三大区域:工作区: 最新状态文件直接修改的位置 暂存区: 汇总已经修改和暂存存储 本地版本库: 存储分支+历史版本
+    git init 
+    git status 
+    git add .
+    git commit -m 
+    git diff HEAD 文件名
+    git diff --cached 文件名
+    git diff 文件名
+    git 命令 --help 
+2. 写出查看提交记录的两条核心命令，以及各自配套常用参数，并说明两者区别。
+    查看:
+        git log    : 查看[当前分支][有效]的[详细信息 长版本号-提交人-邮箱-时间-描述]
+        git reflog : 查看本地库中[所有分支][所有操作]提交点的简单信息 短版本-提交描述
+    参数:
+        git reflog -n number 查看最近几条提交
+        git reflog show 分支 指定分支
+        git reflog --since="时间 | 时间运算 ago" --until="时间 | 时间运算"
+3. 写出三种版本回滚 git reset 完整命令，分别说明三种模式的差异。
+    git reset --soft               软回滚,会将要删除覆盖的文件不会真的删除,放在暂存区! 用于修改message再次提交!
+    git reset | git reset --mixed  混合回滚: 不会删除,将文件返回在工作区,可以分批添加暂存区或者提交! 用于文件提交错了 重新提交!
+    git reset --hard               硬回滚: 删除文件和覆盖! 只保留目标提交点的内容! [git reflog]
+4. 写出分支全套操作命令：创建、查看、切换、创建并切换、删除、合并分支(快速和非快速)。
+    分支: 主干的副本,更安全/并发开发!  main: 存储版本提交点  develop: 开发分支存储功能提交点  feature: 开发详细的提交过程  fix-hot-fix: 修复分支
+    git branch 分支名
+    git branch -v
+    git checkout 分支名
+    git checkout -b 分支名
+    git branch -d (删除已合并分支) | -D (强制删除合并或者未合并的分支) 分支名
+    git merge 分支名 (快) || git merge --no-ff 分支名 (慢)
+5. 开发中途代码未写完，需要临时切换分支，写出 stash 全套存储、查看、恢复、删除命令。
+    stash临时存储区域! 场景: 代码没写完,突然来一个急活! 不能提交,又不能回滚! 还不能切换分支(工作区和暂存区) -> stash 
+    git stash save -u "存储描述"
+    git stash list 
+    git stash apply / pop -> 版本
+    git stash drop 
+    git stash clear 
+6. 代码合并出现冲突后，请写出完整解决流程与对应命令，并说明冲突产生原因。
+    冲突原因: 同一个文件.同一行,出现不同的内容,git无法自动合并! 需要人工参与!!
+    解决步骤: 
+       1. 手动参与编辑  ==HEAD  ==版本号 -> 找版本号提交者问下商量下!!
+       2. git add .
+       3. git commit -m ""  不要指定文件名..
+
+7. 本地仓库与 Gitee 远程仓库关联、查看、解绑、推送、拉取全套远程命令。
+    git remote add 别名 远程地址https/ssh
+    git remote remove 别名
+    git remote -v
+    git push 别名 本地分支名:远程分支名
+    git pull 别名 远程分支名
+    git clone 仓库地址

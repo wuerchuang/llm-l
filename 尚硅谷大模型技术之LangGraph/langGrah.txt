@@ -1,0 +1,25 @@
+LangGraph:一个低编排框架和运行时环境，为构建 管理 和部署长期运行具有状态的智能体设计的
+	核心理念：工作流建模为图：由节点：自定义的逻辑、边：节点间的执行流行转化逻辑、状态：图执行过程中共享数据。
+	核心能力：持久化执行支持断点续传、人机协作：实现人工审核Human-in-the-loop、记忆管理：支持长期记忆与短期记忆、流式处理：支持流式实时数据输出。
+	langchain langgraph对比：langGraph提供低粒度控制，内置状态机与检查点、基于图的并行/条件执行、原生支持持久化、适合复杂智能体开发。langChain:开箱即用、需要自行管理状态、线性链式执行、持久化需额外实现、适合简单链式调用、快速原型开发。
+	State:贯穿应用周期的全局变量、无论走到哪个节点都要读state并更新
+		定义state:TypeDict: 本质是一个字典、优势在于可以严格指定类型、ide会有错误提示
+		输入输出数据隔离：创建StateGraph()可传入state_schema:必须指定、不能为空、input_schema：可选默认与state_schema相同、限制了输入接口只有在input_schema中定义的字段才能传入、output_schema可选默认与state_schema相同、限制了输出接口只有在output_schema中定义的字段才能输出。
+		节点间数据隔离：精细管理每个节点的权限。
+		reducer函数：状态合并，默认覆盖，新值完全替换旧值，Reducer函数，如add_message等 Annotated[type,reducer函数]的方式实现自增
+	State持久化状态存储：Langraph中的checkpointer,创建checkpointer实例、编译图时传入checkpointer、invoke的时候传入config={'configrable':{'thread_id':''}}
+		断点续跑：invoke 传入state为None、config传入上次的thread_id即可实现断点续传。
+	langGraph的底层算法：Pregel算法：管理Runtime的核心类。由两大核心组件构成，Actor:即node,每个actor都会订阅channels,从中读取或写入数据。
+					channels: 用于Actors之间的通信。 节点执行Pergel驱动：分一下三个过程：Plan:确定当前步执行哪些Actors(订阅了上一个步骤中更新chenel的actor)、execute阶段：执行选定的actors,直到所有完成或其中一个失败超时、update:本步骤Actors写入值更新channels.    graph.compile() 将逻辑图转为pregel对象，node转为Actors、edge转为channel
+
+节点：输入在运行时自动注入：state（业务数据）、config（配置信息）、runtime(运行时上下文：context、store、stream_writer):
+	输出：增量更新	，若返回整个state,对于未配置reducer的字段 多个节点并行更新同一字段会引发冲突
+	特殊节点END、START 本质时使用sys.intern优化后的字符串常量，分别代表图的入口出口。
+	节点缓存：langgrapg.cache 提供了内存级缓存、Redis缓存、Splite缓存，在调用graph.compile()时传入对应缓存实例。
+	流式输出：Runnable接口提供了stream、astream方法 提供了多种模式、values、updates、custom、混合模式
+	人工审核与中断：图内暂停、外部交互、用户决策、恢复执行（graph.invoke(command(resume=))）、继续运行。使用interrupt时需要配置checkpointer,以便保存当前状态。
+边:条件边：核心是一个路由函数接受state返回目标节点的字符串、路径映射将路由函数的返回值映射到实际节点名称。
+	可控循环边：在graph.invole 的config中配置recursion_limit（递归限制）防止图陷入无限循环
+
+
+

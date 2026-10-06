@@ -1,0 +1,33 @@
+1、从镜像-共享镜像位置-创建实例
+
+2、按照课件的流程做基础的配置
+
+3、设置用户名、密码
+
+使用我的密码：abcd_1234
+
+4、配置完以后，使用Xshell登录：
+用户名：ubuntu
+密码：abcd_1234
+
+5、XShell登录上以后，执行如下两个指令：
+
+sudo systemctl start docker
+
+sudo systemctl status docker
+
+确定docker启动
+
+6、启动dify
+进入到本地dify下的docker的目录，执行
+sudo docker compose up -d
+
+7、使用浏览器访问：
+
+http://你的腾讯云实例的ip:80
+
+即可访问dify
+
+8、登录dify
+邮箱：shkstart@126.com
+密码：abcd_1234

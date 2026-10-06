@@ -1,0 +1,21 @@
+Pytorch: 是深度学习领域主流的开源python框架。核心功能：提供类Numpy的张量计算体系，内置自动微分系统
+	Tensor的使用：
+		1、创建tensor:torch.tensor() 传入一个标量：会生成一个dim为0的张量。传入n维数组：产生n维张量。传入nd.ndarry：可直接将ndarry数值转为张量。基于shap形状创建张量：tensor:torch.tensor(2，3，5)
+		2、 张量的数据类型:torch.tensor() 数据类型根据输入数据推断，int默认int64、float默认float64。torch.Tensor()固定为float32.可通过dtype指定类型。torch.Int/Long/Float/Fouble/Half/Bool/ByteTensor方法用于创建不同类型张量。
+		3、根据数据区间创建张量：torch.arrangr(10)固定步长生成张量、线性空间torch.linespace(start,end,生成个数)、对数间隔：torch.logspace(1,3,3) 以10为底成指数分布：10，10^2，10^3
+		4、根据填充创建张量：torch.ones/torch.one_like、全常量张量：torch.full、单位矩阵torch.eye
+		5、随机创建张量：torch.rand(2,3) [0-1)均匀分布，torch.randint(1,100,size()),整数随机张量。标准正态分布张量：torch.randn(2,3)、普通正态分布torch.normal(均值，方差，size())、随机打乱：torch.randperm(n) [0,n)的整数随机打乱，torch.manu_seed(42)设置随机种子。
+		6、张量转换： 元素类型：to（）方法或type（）方法。直接调用类型方法：t1.float()
+					tensor转ndarray调用numpy()方法，默认共享内存 修改张量ndarry会同步修改。
+					张量转标量：t1.item()，tensor中有一个元素无论几维都可以转为标量。
+		7、tensor数值计算：基本运算：+/add()/add_()、-/sub()/sub_() 、*/mul（）/mul_()张量与标量或哈达玛积、/或div()/div_() 张量/标量或逐元素相除。加下划线的原地修改。
+						其它常用数学运算：-/neg()/neg_()逐元素取反、**/pow()/pow_()逐元素平方、sqrt()/sqrt_()逐元素求平方根、exp()/exp_()逐元素以e为底的指数运算、log（）/log_()逐元素以e为低的对数运算。
+						矩阵相乘：t1@t2 等价于matmul()兼容二维与高维矩阵相乘、t1.mm()只支持二维矩阵
+						统计运算：1、求和，t1.sum(dim),求均值：t1.mean(dim),最值：t1.min(dim)/t1.max(),方差标准差：他，var(dim,unbias)/t1.std(dim,unbias),去重：t1.unique(return_counts,sorted),对所有元素去重，返回排序后的一位唯一值列表与统计的次数。t1.sort(dim,descending)按指定维度排序，默认返回排序后索引。
+		8、索引操作：链式索引t1[0][0][0]、逗号分隔索引t1[0,0,0],范围索引t1[1,1:,:-1]，列表索引：一维列表索引：list1对应第0维，list2对应第1维...、二维列表索引：广播匹配，批量提取多个元素。布尔索引：t[t>5]、mask=t[:,0,:]>5,t[mask]
+		9张量形状操作：维度交换：t1.T 反转所有维度顺序适用任意维度张量、t1.mT矩阵转置，仅交换最后两维，t1.transpose(dim1,dim2),交换指定两个维度，t1.permut重排列所有维度。
+					调整形状：t1.reshape()核心规则，交换后各维度的乘积必须与原张量相等，不要求张量内存连续。
+							t1.view（）需先调用contiguous（）强制连续再调用view
+		10、增删维度：删除维度：squeeze()删除大小为1的维度、unsqueeze(dim)在dim位置增加一个大小维1的维度。
+		11、张量拼接：torch.cat()按指定维度拼接、torch.stack()堆叠操作，先新增一个大小为1的维度，再按新增这个维度拼接cat(）
+		

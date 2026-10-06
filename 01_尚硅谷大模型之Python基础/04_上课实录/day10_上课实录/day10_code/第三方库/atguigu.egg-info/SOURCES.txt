@@ -1,0 +1,12 @@
+setup.py
+aguigu/__init__.py
+aguigu/mygraphic/__init__.py
+aguigu/mygraphic/circle.py
+aguigu/mygraphic/rectangle.py
+aguigu/mymath/__init__.py
+aguigu/mymath/advance_calculate.py
+aguigu/mymath/basic_arithmetic.py
+atguigu.egg-info/PKG-INFO
+atguigu.egg-info/SOURCES.txt
+atguigu.egg-info/dependency_links.txt
+atguigu.egg-info/top_level.txt

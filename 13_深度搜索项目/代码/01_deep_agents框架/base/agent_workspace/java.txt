@@ -1,0 +1,19 @@
+Java Programming Language History
+
+- **1991**: A team led by James Gosling at Sun Microsystems (now owned by Oracle Corporation) began developing Java as a project called Oak. The goal was to create a new programming language for digital devices such as set-top boxes.
+- **1995**: Java 1.0 was released with the tagline 'Write Once, Run Anywhere (WORA)', which emphasized the cross-platform nature of the language. This version included basic features like primitive data types, object-oriented programming, and the first version of the Java Development Kit (JDK).
+- **1996**: Introduction of the 'HotJava' browser, which supported applets and dynamic web pages written in Java. This was an early attempt to make the web more interactive through the use of a powerful, network-aware scripting language.
+- **1997**: J2SE 1.1 was released, introducing the JavaBeans component architecture, JDBC (Java Database Connectivity), and RMI (Remote Method Invocation). It also improved the performance of the Java Virtual Machine (JVM).
+- **1998**: J2EE (Java 2 Platform, Enterprise Edition) was introduced, aimed at simplifying the development, deployment, and management of multi-tier server-centric applications.
+- **1999**: J2SE 1.2 was launched, which was a major upgrade with many new features including the Collections Framework, strictfp keyword, and the integration of the Swing toolkit for building graphical user interfaces.
+- **2000**: J2ME (Java 2 Platform, Micro Edition) was introduced for consumer electronics and embedded devices, expanding Java's reach beyond desktops and servers.
+- **2004**: J2SE 5.0 (also known as Tiger) was a significant release that added several new features, including generics, autoboxing, and the 'for-each' loop, which made the language more robust and easier to use.
+- **2006**: Sun Microsystems announced that Java would be open-sourced under the GNU General Public License (GPL), making the source code freely available to the developer community.
+- **2009**: Oracle Corporation acquired Sun Microsystems, taking over the stewardship of Java. This marked a new era for the language under a different corporate leadership.
+- **2011**: Java 7 was released, bringing improvements such as the try-with-resources statement, the diamond operator, and NIO.2 (New I/O) for better file handling.
+- **2014**: Java 8 was launched, introducing lambda expressions, functional interfaces, and the Stream API, which significantly enhanced the language's support for functional programming paradigms.
+- **2017**: Java 9 introduced modularity with the Java Platform Module System (JPMS) and other improvements like JShell for interactive Java scripting.
+- **2018**: Java 10, a short-term release, was quickly followed by Java 11, which was a long-term support (LTS) version. Java 11 included HTTP Client APIs and continued to improve the JVM's performance.
+- **2021**: Java 17 was released as the latest LTS version, featuring pattern matching for switch, sealed classes, and removal of the experimental AOT and JIT compiler.
+
+The Java programming language has evolved significantly since its inception, becoming one of the most widely used languages in the world. Its success can be attributed to its platform independence, strong community support, and continuous innovation.

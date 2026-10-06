@@ -1,0 +1,15 @@
+1. Transformer相比RNN的核心优势是什么？
+
+2. Self-Attention的计算公式是什么？为什么除以√d_k？
+
+3. Multi-Head Attention 的作用是什么？
+
+4. 为什么 Transformer 需要 Positional Encoding？
+
+5. 简述Transformer模型的整体结构。
+
+6. 残差连接的意义是什么？
+
+7. Masked Self-Attention 的作用是什么？
+
+8. Transformer中的Feed Forward Network（FFN）的计算公式是什么？

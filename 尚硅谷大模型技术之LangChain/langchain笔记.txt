@@ -1,0 +1,64 @@
+langchain笔记：langchain可用于agent搭建，问答系统，RAG系统
+langchain包： langchain:搭建agent的主入口点 langchain-core:核心接口和抽象、langchain-openai/deepseek 集成包。还包括一次额涵盖了文本生成模型，工具，文档加载，向量存储等多方面。langchain-mpc-adapter:提供MPC工具、langchain-text-splitter:文本切割。
+
+langchain核心组件：Model I/O:Format：模板管理大模型的输入。predict:调用LLM接收输入，生成回答、Parse:解析模型输出为特定格式
+				1、构造chatModel、2、传入消息列表调用模型 3、Paser解析结果
+				如何让大模型输出json:1\prompt明确约束模型生成Json、给出要输出的json示例、接口参数限制模型输出json
+					模型厂商：api提供了专门参数，可以定义一个schema结构（一个类基础pydantic.BaseModel）
+					Langchain也提供了封装 ：new_llm=llm.with_structured_output(schema=CalendarEvent)
+				提示词模板：ChatPromptTemplate：可以将变量插入到消息模板中、PromptTemplate：将变量插入到以提示词模板中
+				 \Chains：链式调用 模板、大模型调用、parser都调用了invoke 底层实现了Rannable接口
+					方法 invoke/ainvoke;batch/abatch;stream/astream
+				   runnablesequence通过管道符 | 按顺序连接多个runnale对象，RunnableParallel可并行处理多个runnablesequence 
+				rannableLambal可将普通函数封装为Runable可运行组件
+				RunnableBranch:可进行if-else判断路由到不同函数	
+				RunnablePassthrough 接受输入将其原样输出
+				RunnableWithFallbacks:失败后退回其他Runnable
+				\RAG：检索外部数据
+				1、大模型局限性：知识滞后、知识缺失、模型幻觉：编造事实（LLM训练过度泛化、没有学到深层含义）
+				2、RAG实时信息检索技术，为模型补充上下文
+				优点：更丰富的上下文和数据样本（相对提示词）、提升问答时效性可靠性（相对微调）、保护了业务隐私
+				缺点：检索外部延迟较高，外部知识额外消耗token
+				流程：索引：加载数据：md:UnstructuredMarkdownLoader加载标题单独切分成element，标题下的按段落切分成element、加载DOC:文档Unstructured.io的Loader对.docx进行解析无法识别标题等结构、PDF:使用mineru解析后加载。
+				切分：为什么切分：模型不能充分利用长上下文的信息尤其是中间部分信息。
+					切分策略：固定字数切分、递归使用分隔符切分： RecursiveCharacterTextSplitter、语义切分：将相邻句子组成一个组，做嵌入向量比较、语义变化大的位置切割
+				文本块向量化：使用huggingface提供的开源嵌入模型可使用HuggingFaceEmbeddings类
+、				存储向量：milvus:通过数据库-collection（二维表）-实体（一行数据）的结构管理数据。
+				检索：	稠密向量：用于表示语义；使用HNSW索引，从顶层入口点开始，贪婪搜索、层层下降、最后细化
+						稀疏向量：表示文本中的关键词及其权重。SPARSE_INVERTED_INDEX ，倒排索引 保存token:在哪些chunk中出现以及对应权重值。使用IP、或BM25：（综合考虑词频和逆文档频率）查询
+					
+				\Agent.自主规划执行步骤，调用工具，适合处理开放式多步骤任务。
+						agent核心能力：大模型/llM，推理规划，知识解释
+									记忆memory:短期记忆与长期记忆，支持快速知识检索
+									tolls工具：调用外部工具的执行单元
+									规划plaining：任务分解，反思实现，复杂任务处理
+									行动action:执行决策能力
+									协作：与其他agent交互，完成更复杂任务。
+				agent构建：model，system_prompt、tools、response_format、checkpointer、middleware						1、添加本地工具：langchain.tools 提供了tool装饰器，可以将函数构造为一个工具，需要在装饰器里指定description或在函数里添加描述。
+						2、添加MCP:是一个开源协议（模型上下文协议）标准化了llm与外部工具和数据的通信方式。							
+							MCP架构：mcp主机：协调或管理一个或多个mcp客户端的ai应用、MCP服务器通过协议向客户端暴漏工具、资源和提示模板功能。MCP客户端：与mcp服务器连接的组件、从mcp服务器请求可用的工具和资源，管理与服务器连接的生命周期。
+							mcp数据传输协议：Streamable HTTP:使用Http post和get请求，服务器流式响应请求，支持授权令牌与api密钥\ Stdio:标准输入输出流，适合本地开发
+							
+							MCP工作流程：握手与声明：AI应用启动时，根据配置启动MCP server,host记住这些工具的名字和用法说明、用户提问于上下文注入：host会把问题于mcp工具说明一同发给大模型、模型决策：llm决定是否调用mcp相关工具、路由与执行：hst发现llm要调MCP通过MCP协议给MCP Server法消息，server收到请求执行操作、结果回传：MCP响应发给host host将结果发给大模型。
+							langchain使用mcp、通过langchain-mcp-adapters使用mcp服务定义的工具。通过MuitiServerMCPClient.client获取mcp客户端、通过client.get_tools()获取工具，通过tools参数传给agent
+						3、agent添加记忆：短期记忆：在creat_agent 的checkpointer参数赋值、使用thread_id作为粒度进行隔离。	langgraph.checkpoint.memory import InMemorySaver 示例化对象传给checkpointer 通过config={'configurable':{'thread_id':""}}定义thread_id 
+						4、添加中间件：控制agent在执行当中的行为：总结中间件，多历史消息列表进行总结、Human-In-The-Loop中间件，在调用工具中引入人类审核机制。before /after agent  before/after model :切片编程思想。 wrap_tool、wrap_call  添加重试 缓存 多次调用等逻辑 代理思想。  from langchain.agent.middleware.human_in_the_loop import HumanInTheLoopMiddlewaer 定义 tool_name_to_interrupt{'操作':'是否配置中断'}，实例化HumanInTheLoopMiddlewaer（）传入配置。
+在creat_agent中传入middelware参数，中断功能必须配置短期记忆（checkpointer）且需要二次调用并通过Comand()传入审核结果。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

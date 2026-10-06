@@ -1,0 +1,33 @@
+10分钟 
+
+1. 解释下单智能体和多智能体的区别? 多智能使用的四个前提!!
+      单智能体: 一个智能体 / 一个模型 / 一套上下文 有规划能力和工具! 
+      多智能体: 分而治之  / 有一个主智能体 / 多个工作子智能体 / 上下隔离 
+
+      四个前提:  
+         1. 问题极度开放
+         2. 存在领域冲突
+         3. 存在并发需求
+         4. 多模型的需求
+
+2. deepagent创建agent(create_deep_agent函数)有哪些属性以及属性含义?
+      
+      create_deep_agent(
+           model = 模型
+           tools = 工具列表
+           *
+           system_prompt = 
+           subagents = 
+           store =
+           checkpointer
+           interrupt_on = {}
+           backend= 
+           permissions=
+           skills = 
+           memory = []
+      )
+
+3. 创建子智能体dict和CompiledSubagent的区别以及二者有哪些属性?
+4. 解释下人机交互(hitl)的最佳实践四步骤! 以及approve/edit/reject/respond的区别!
+5. 解释下什么是backend以及种类? permissons和backend有什么关联?
+6. 解释下什么是skill?解释文件格式和什么是渐进式加载!

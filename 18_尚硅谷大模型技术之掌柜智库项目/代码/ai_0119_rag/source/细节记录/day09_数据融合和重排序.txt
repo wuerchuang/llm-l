@@ -1,0 +1,85 @@
+
+1. node_rrf节点实现
+   公式: score_map.get(chunk_id, 0.0) + 1.0 / (k + pos) * weight
+   解析: 权重 + rrf
+   作用: 进行同源数据排序
+   入参: embedding_chunks []  hyde_embedding_chunks  [{id:chunk_id,distance:分,entity:{} -> 最终}]
+   出参: rrf_chunks [entity,entity] -> 排序 rrf + 权重
+   步骤:
+        1. 日志+任务
+        2. 参数获取和校验 embedding_chunks hyde_embedding_chunks  get("key",[])
+        3. 处理下集合参数 [(embedding_chunks,1.0),(hyde_embedding_chunks,1.0)]  -> param_list
+        3. 定义个rrf+权重排序的函数  param_list  -> rrf_chunks
+             1.0 / (k+rank) * weight
+             3.1 定义记录分数的字典类型 / 记录存储数据的字典类型
+                 score_map = {key -> chunk_id , 累计分数}  累加
+                 chunk_map = {key -> chunk_id , entity}  只记录一次即可 (第一次已经存储了,不在第二存储)
+             3.2 遍历 param_list 拿出某一路
+                  embedding_chunks,1.0  hyde_embedding_chunks,1.0
+                  3.3 再循环具体路的数据 embedding_chunks -> item (1 , 2, 3)
+                       计算分数公式 score_map.get(chunk_id, 0.0) + 1.0 / (k + pos) * weight
+                       如果没有记录过chunk chunk_map 存储一下
+             3.3 分和数据字典都有了,对分数进行排序
+             3.4 处理数据类型  [entity,entity]
+             3.5 返回结果
+        4. 日志+任务
+        5. 返回结果 state [rrf_chunks] = 值
+
+2. node_reranker节点实现
+   作用: 网络搜索的数据 + rrf的数据进行精排序,并且topk
+   入参: rrf_chunks = [{title,content,type: mivlus}]  web_search_docs = [{snippet,title,url}]
+   出参: reranked_docs = [{title,text(content snippet),url,type: web | milvus,score: reranker}]
+   步骤:
+        1. 日志+任务
+        2. 获取参数校验
+        3. 将两路数据捏到一起 [{},{}] -> 两个循环 rrf_chunks | web_search_docs
+        4. 使用reranker进行问题和答案打分(批量处理)
+           https://www.modelscope.cn/models/BAAI/bge-reranker-large/summary
+           4.1 下载模型的权重文件到到本地
+                from modelscope.hub.snapshot_download import snapshot_download
+
+                local_dir = r"D:\ai_models\modelscope_cache\models\rerank"
+
+                snapshot_download(
+                    model_id="BAAI/bge-reranker-large",
+                    cache_dir=local_dir,
+                )
+                print("下载完成，模型目录：", local_dir)
+           4.2 检查下配置文件和模型加载工具
+                # 重排序模型配置
+                BGE_RERANKER_LARGE=D:\ai_models\modelscope_cache\models\rerank\BAAI\bge-reranker-large
+                #BGE_RERANKER_DEVICE=cuda:0
+                BGE_RERANKER_DEVICE=cpu
+                #BGE_RERANKER_FP16=1
+                BGE_RERANKER_FP16=0
+
+                reranker_utils.py
+           4.3   [{},{}] -> 将原始数据处理成成对的数据列表
+                循环  [{},{}] -> text -> 问题 |  rewritten_query
+                [[rewritten_query,text]]
+
+                注意: bge-reranker-large 上下文窗口大小 512
+                一对不能超过 -> lm -> 总结
+
+                # uv add dashscope
+                import dashscope  # 百炼
+                def count_qwen_tokens_sdk(text: str) -> int:
+                    # 新版用法 ↓↓↓
+                    return len(dashscope.tokenizers.get_tokenizer("qwen-flash").encode(text))
+                # 测试
+                test_str = "测试Qwen token计算"
+                print(count_qwen_tokens_sdk(test_str))
+
+
+                [分,分,分,分] =  compute_score([[问题,答案],[问题,答案],[],[]])
+           4.4  [{ score: x},{ : score}]
+                原来的列表,再次循环,添加score  "" [分,分,分,分] -> 原始列表的数据
+                [{ text,title, url,type, score: x},{ : score}]
+           4.5  排序处理
+                [{ text,title, url,type (高分), score: x},{ : score}]
+           4.6  返回
+
+3. 今日目标
+   1. rrf_node [两路获取数据 (向量查询) , 两路数据进行融合 rrf + weight ]  同源数据如何融合(rrf)
+   2. reranker模型的使用 (下载,工具类加载,排序方法,注意事项: 序列大小) score_list = reranker.compute_score(question_paris,normalize=True)
+   3. 放断崖算法 -> 两个两个比较! 算分差和分差比! 注意: mintopk  topk  maxtopk

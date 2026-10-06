@@ -1,0 +1,13 @@
+Hugging Face:致力于简化预训练模型的使用，由两大核心部分组成：huggingface hub(开源平台，托管模型、数据集和应用)、工具链Libraies（围绕预训练模型构建的工具库，覆盖数据处理，模型训练与推理）Datasets(加载和处理数据集)、Tokenizers(文本转换为模型输入的工具)、Transformers(用于加载，使用，微调各种预训练模型)。
+1、模型加载：
+		AutoModel类，用于下载和加载模型：AutoModelForCausalLM：适用于自回归语言模型，预测下一个token、AutoModelForSeq2SeqLM:序列到序列生成，机器翻译和对话生成、AutoModelForSequenceClassification:文本分类，分类任务、AutoModelForTokenClassification：token标准，实体命名识别任务，AutoModelForQuestionAnswering:抽取式问答，从上下文找出答案的起始结束位置。from_pretrained() 中设置参数用于控制任务头的行为如num_lables指定分类输出维度。
+2、Tokenizer: 每个模型绑定一套专用的tokenizer,将文字转化为模型输入（input_ids、attention_mask），包括几个方面，子词切分：将文本转为词源、编码映射：将词源转为ids、添加特殊Token:自动插入[cls]、[seq]等标记、截断与补齐：批量构造，统一长度、生成辅助输入：attention_mask、token_type_ids等字段。
+	tokenizer使用：tokenizer( padding='max_length' 自动补齐，truncation=True:自动截断，max_length,return_tensors='pt'返回pytorch张量      )
+3、Datasets:为自然语言任务设计的数据处理。
+	加载本地数据：datasets.load_dataset('文件格式：csv/json',data_file:文件路径，（单个文件）传入字符串或（多个文件）字典)。返回一个Datasetdict对象，默认键名为‘train' 通过dataset_dict['train']的方式访问。
+	预处理数据集：删除列：dataset.remove_columns(['cat'])、过滤行：dataset_filter(lambda x:x['review'] is not None and x['lable'] in [0,1])、划分数据集：dataset.train_test_split(test_size=0.2) train_datasat=dataset_dict['train']...
+			编码数据：dateset.map(function,batched=False) 将原始文本批量编码为模型的输入格式，input_ids、attention_mask、token_type_ids 
+	保存数据集：save_to_disk() 适用Dataset/DatasetDict;to_csv适用Dataset；to_json适用Dataset
+4、Dataloader: dataset实现__len__()和__getitem__()两个核心接口，能被DataLoader正确识别并批量迭代。
+	dataset在被Dataload集成之前需要.setformat(type='torch',columns=['','']),自动转为torch.Tensor,未通过columns指定的字段访问会被过滤。
+	

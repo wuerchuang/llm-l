@@ -1,0 +1,362 @@
+1. 分布式版本控制工具介绍
+   1.1 什么是版本控制以及作用? 
+       创建文件的历史记录副本
+       例如: xx.doc -> xx.doc_v1.0
+       版本控制可以[体现过程]以及[安全保护]!!
+       git的第一个功能: 就是进行版本控制 
+       我们 -> 命令 -> git -> 文件 -> 版本 -> 保存 -> 版本进行可视化 | 进行版本的回滚动作..
+   1.2 git的作用
+       git = 分布式版本控制系统
+       作用1: 做文件的版本控制 (创建/查看/回滚等等...)
+       作用2: 做团队代码的整合 (代码合并功能)
+       		  利用远程仓库,实现代码的间接共享
+       作用3: 团队的访问权限控制 
+
+   1.3 分布式和集中式版本控制系统
+       集中式版本控制系统: CVS/SVN  只有一个统一的中央仓库进行代码存储,本地都是工作区(最新的更新文件)和少量的配置!!
+       分布式版本控制系统: Git 本地有完整的代码仓库,同时也可以使用远程的中央仓库互联!
+
+   1.4 git的常见远程仓库类型
+       github/gitee: 公共代码平台(www.github.com/www.gitee.com)
+                     支持创建git仓库
+                     支持git仓库的可视化
+       gitlab      : 需要自己搭建的局域网的git仓库  [公司]
+                     支持创建git仓库
+                     支持git仓库的可视化
+
+2. git的安装和初始化配置
+    
+   2.1 安装 
+       直接双击
+       右键 -> git bash -> git --version 
+       git装到哪了!! -> pycharm
+
+   2.2 基本配置
+   	   git -> 创建 -> 副本(你是谁?你的联系方式?)
+   	   用户名和邮箱! -> git提交版本 -> 拒绝 -> who are you?
+   	   git config --global user.name 名称 
+   	   git config --global user.email 邮箱   
+   	   git config --list 
+   	   --global 全局持久化存储 存储到我们用户的文件夹中  ~/.gitconfig   linux cd -> 家  cd ~ 回家 cd - 上一次 cd .. 上一次
+
+       最重要的命令: git的命令讲不完! 
+          git config --help 
+
+3. git本地基本操作命令
+    
+    3.1 本地三个状态轮转的命令
+        三个区域: 工作区[最新的文件状态]/ 暂存区[临时存储和汇总提交] / 版本库[版本+版本文件存储] 
+        git init 初始化git仓库 工作区 .git 
+        git status 查看状态  红色 工作区没有提交到暂存区  绿色在暂存区没有提交到版本库
+        git add .  | git add 文件名 工作区添加到暂存区
+        git commit -m "描述" 提交版本库
+        git log / git reflog 查看版本信息
+        git reset --soft / mixed / hard 版本号
+
+    3.2 增删改查命令操作
+        理解: 不管是增删改都是添加到暂存区,提交到版本库!
+        为什么? 版本库存储的是之前的版本信息,本次提交并不会修改和影响之前的版本! 只是重新记录现在的状态!
+           之前 5    新版本 3    新 3
+        git add . git commit -m "xx"
+
+        [初始化仓库 - 状态查看 - 创建文件 -> 提交 -> 修改文件 -> 提交 -> 删除文件 -> 提交]
+
+        对比命令: 
+        工作区和暂存区: git diff 文件名  [注意,没有添加到暂存区,暂存区使用最新版本状态状态]
+        暂存区和版本库: git diff --cached 文件名
+        工作区和版本库: git diff HEAD 文件名    
+        提交点之间比较: git diff 版本号 版本号
+
+    3.3 版本查看和版本回滚 
+        查看版本:
+           git log    : 查看详细版本 长提交点 + 提交人 + 提交人的邮箱 + 日期 + 提交描述
+                        查看当前分支,[有效的]提交点信息
+           git reflog : 查看简略版本 短提交点 + 提交描述   [推荐]
+                        查看当前本地仓库的所有分支的所有提交点信息
+           例如:  
+                 master 1  2 3 
+
+                             develop  a  b  c
+
+                 在master分支: git log  1 2 3 
+                              git reflog 1 2 3 moving a b c 
+           例如: 版本回滚 
+
+                 master 1 2 [3] 4 5 
+                 版本回滚:  git log     1 2 3
+                           git reflog  1 2 3 4 5 3   
+        查看版本参数: 
+           git reflog show [分支名]  不加看的是本地的所有分支的提交点
+           git reflog -n number     查看近期指定的条数
+           git reflog --since="" >=  --until="" <=
+           七天内的提交点: git reflog --since="2026-08-28 || 7 days ago [运算符号]"
+           近2小时 ~ 30分钟前 之间的操作  git reflog --since="2 hours ago" --until="30 minutes ago"
+           去年的六月   git reflog  --since="2025-06-01" --until="2025-06-30"
+
+        版本回滚命令:
+            版本回滚:  1  2  3 <-  4   5    回退到3回滚:  1  2  3 <-
+            真正在开发中,只有本地个人分支才可能回滚! 1 -> 2 正常的主干 main develop 根本不可能回滚,通过补丁(新的版本)
+            [revert] -> 反向提交 -> 放弃某个提交点的代码!  1 -> [2] -> 3 -> 4  reset 3 4
+                                                                             revert 1 -> 2 -> 3 -> 4 -> 新的提交点 2的内容移除
+
+            git reset --soft 版本号      软回滚: 不会删除文件,将回滚的内容放到暂存区! 再次提交,[修改描述]!!
+            git reset  版本号  || git reset --mixed 版本号     混合回滚 : 不会删除文件 将回滚的内容放到工作区!! [修改提交文件]     
+            git reset --hard 版本号      硬回滚: 会删除文件,清空对应暂存区区和工作区的文件! 代码覆盖! 依然可以使用reflog查看历史版本,进行再次穿梭   
+        
+        上午命令总结:
+           git config --global user.name user.email 值
+           git cofnig --list 
+           git init 
+           git status 
+           git add . 
+           git add 文件名
+           git commit -m "内容"
+           git cimmit -m "内容" 文件
+           git diff HEAD 文件名 工作区和版本库
+           git diff --cached 文件名 暂存区和版本库
+           git diff 文件名 工作区和暂存区
+           git diff 版本号 版本号 
+           git log  查看详细当前分支有效提交记录  1 2<- 3  => 1 2 
+           git reflog 查看本地库中所有分支所有操作记录   1 2<- 3  => 1 2 3 2
+                   -n number   近期的几条
+                   show 分支名 指定分支查看
+                   --since=">=日期 日期 | xx days ago"
+                   --until="<=日期 日期 | xx days ago"
+           git reset --soft 版本  软: 不会删除,将要'删除'文件放在暂存区,可以再次提交修改提交的message
+           git reset --mixed 版本 | git reset 版本  混合: 不会删除,将要'删除'文件放在工作区,可以再次提交! 修改提交的文件数量
+           git reset --hard 版本  硬: 会删除文件, reflog查看历史记录再次回滚
+
+           touch 文件名  创建文件
+           mkdir 文件夹  创建文件夹
+           rm -f  文件   删除文件
+           rm -rf 文件夹 删除文件夹
+           cat 文件名    查看文件内容(一屏幕能显示的内容)
+           more/less 文件名 查看文件内容(多文件内容)
+           head/tail 文件名 从头查看文件/从尾查看文件 从尾查看文件 -f 
+           echo "内容" >> > 文件 快速将内容写入到文件 当然也可以 vim  
+4. git本地分支操作命令
+   
+   4.1 分支的概念
+       默认git init会创建一个主干 master! 基于主干master复制出来的一个副本分支!! (文件夹 / )
+       分支就是一个文件夹,内部存储提交点! 
+       保证主干分支中存储的是稳定没有错误,经过校验代码! 
+       git init ->  master -> a -> b -> c -> d -> e  ----------  i
+                                                  |              |
+                                       feature    e -> f -> g -> h   <- 充分的测试和验证
+
+   4.2 分支的作用和优势
+       1. 容错率更高
+       2. 并行开发互不干扰
+       3. 保留多个发布版本
+   4.3 分支的使用流程
+       分支的命名推荐: 
+           main/master: 存放测试过,以及发版后对应的版本代码             1 
+           develop    : 存放完整的功能的代码,合并开发者初测试过的代码    1
+           feature    : 存放开发者的功能代码 -> 每个功能               n  feature/功能..
+           fix/hot-fix: 存放修bug的代码分支                           n  hot/xxx
+           refactor：代码重构、优化、结构调整，不改业务逻辑
+           docs：文档、注释、README 修改
+           test：补充单元测试、集成测试脚本
+           build：打包、Docker、CI/CD 部署配置修改
+       使用分支开发的流程: 
+           1. 接收开发任务,从develop拉取特性分支(feature/xxx)
+           2. 在特性分支(feature/xxx)代码开发和自测
+           3. 将自测的分支推送到远程仓库,并申请MR[Merge Request]/PR [Pull Request](合并请求)
+           4. 领导检查我们推送的分支,无误后合并到develop中
+              .....
+           5. 确定版本,拉取发布分支,并且将develop合并到main/master分支中   
+
+   4.4 演示分支命令和演示
+       分支命令: 
+          1. 创建分支 git branch 分支名
+          2. 查看分支 git branch -v 查看分支
+          3. 合并分支 git merge 分支名 (快速) || git merge --no-ff 分支名 (非快速合并)
+          4. 删除分支 git branch -d | -D 分支名
+          5. 切换分支 git checkout 分支名 | git checkout -b (branch) 分支名 创建并切换分支
+       分支演示:
+          master develop feature 
+          实现用户模块 / 登录 - 注册 - 退出登录
+        细节1: 切换分支原理 
+           master => git checkout 分支名  1. 目标分支最新版本内容覆盖工作区内容 [ 2. 工作区的修改 3. 暂存区的存储 ] 不属于任何版本
+           注意: 分支必须要充分提交,再切换分支!! [stash]
+        细节2: 快速合并和非快速合并
+           git merge 分支名 [快速合并]   git merge --no-ff 分支名 [非快速合并]
+           
+
+            快速合并:   master -> A             
+                                  \
+                          develop  A  -> 1 - > 2 
+                                               |
+                                             master  
+
+            git merge 分支名 快速合并 优势: 就是快,不需要创建新的提交点,复用了被合并的分支! 看起来很顺,一条线!!
+                                     缺点: 太细了, master/main存储的版本提交点,太细了回滚也不方便! 没有体现分支开发的特性特点!
+
+
+            非快合并:   master -> A  --------->  B           
+                                  \             |
+                          develop  A  -> 1 - > 2 
+
+            git merge --no-ff 分支名 非快速合并 缺点: 就是慢,需要创建新的提交点,没复用了被合并的分支! 看起来不很顺,不一条线!!
+                                     优点: 提交点合理(版本), master/main存储的版本提交点,回滚方便! 体现分支开发的特性特点!
+
+
+
+            master -> A    -> B - > C -> D (new)           
+                       \               /           快速和(非快速)没有区别
+               develop  A  -> 1 - >  2 
+                                    
+
+   4.5 演示分支合并冲突
+
+        合并冲突: 
+            将其他的分支合并到develop或者main的时候出现 [无法自动合并]! 需要手动参与! 
+        冲突原因:     
+                               B -> user.py 第一行: aaa 
+                      logout  /                        \
+            develop -> 1 -> 2 (user.py)            ---  D [不会]  user.py aaa - E 合并冲突  同一个文件同一行,出现不同的内容! git不会自动
+                              \                                              /
+                       login   A  -> user.py 第一行: ccc                    /    
+
+
+        解决方案: 人工参与,决定保留什么内容即可!
+           原则: 谁碰见,谁解决!!!
+           避免: 公共文件交给一个人维护! 别同时修改,串行修改!
+           步骤1: 修改冲突文件 
+                 =======HEAD
+                 内容 -> 现在最新版本的内容
+                 ========
+                 内容 -> 要合并入这行的内容
+                 =======分支名
+           步骤2: git add .
+           步骤3: git commit -m "解决冲突"  注意: 不能指定文件名
+
+   4.6 stash临时存储扩展
+       场景: 你的代码写到了一半! 有一个急活! 代码又不能提交! 还不能回滚! 还不能切换分支(工作区和暂存区)
+       解决: git临时存储区域 stash 
+       命令:
+             存储到临时区域: git stash save -u [工作区+暂存区 没有u默认暂存区] "描述"
+             查看临时存储区: git stash list    stash@{0}  stash@{1}
+             恢复临时存储数据: 
+                            git stash apply 恢复最新stash@{0} | git stash apply 指定版本 stash@{2}
+                            git stash pop 恢复最新stash@{0} | git stash pop 指定版本 stash@{2}
+                            apply 应用复制 -> 临时存储依然存在 和 pop 吐使用 -> 从临时存储的数据中去掉! 恢复
+            删除临时存储区域:
+                           git stash drop 版本号 
+                           git stash clear
+       
+5. 远程操作命令
+   5.1 注册gitee账号和关联邮箱
+       远程仓库: github gitee gitlab -> 1.网络地址 2.可视化页面
+       1. 注册www.gitee.com
+       2. 个人设置/配置公开邮箱/https://gitee.com/profile/emails
+   5.2 创建仓库和页面介绍
+       1.  右上角 -> 头像旁边 -> + 
+       2.  仓库名 == 项目名
+       3.  开源和私有
+       4.  不要勾选初始化项 [创建空仓库]
+       5.  仓库地址 
+           地址1: 浏览器上的地址(看仓库代码可视化) https://gitee.com/zhao-weifeng/the-best-in-the-whole-world
+           地址2: https:   https://gitee.com/zhao-weifeng/the-best-in-the-whole-world.git   [使用账号和密码校验]
+                  ssh  :   git@gitee.com:zhao-weifeng/the-best-in-the-whole-world.git      [公私钥对校验]
+       6.  项目页面内容
+            代码  /  issus  /  pull request  / wiki  /  项目管理
+       7.  如何团队开发(对方设置可以提交代码)
+            对方的账号 -> 项目管理 -> 添加成员 -> 开发者
+   5.3 配置公私钥免密登录
+        本地仓库 ->  本地的分支 develop -> 地址2(https/ssh)  -> 远程仓库先校验 -> 远程仓库 develop
+        https 使用账号和密码校验      (登录gitee网站)
+        ssh   使用自己配置的公私钥校验 [推荐]  底层: 天王盖地虎(私钥 - 本地固定位置) = 宝塔镇河妖(公钥 - gitee的网站中)
+        https://gitee.com/profile/sshkeys
+        https://help.gitee.com/base/account/SSH%E5%85%AC%E9%92%A5%E8%AE%BE%E7%BD%AE
+
+        1. 使用命令生成公私钥 
+           ssh-keygen -t ed25519 -C "你的邮箱"
+           回车...
+        2. 查看生成的公私钥 
+           ~ / .ssh /  .pub公钥 
+        3. 粘贴公钥配置到账号的ssh公钥配置中即可
+           https://gitee.com/profile/sshkeys
+
+   5.4 git远程相关命令 
+
+        本地    ==   远程
+        1. 本地关联远程仓库 git remote add 别名 远程仓库地址ssh
+        2. 查看关联远程仓库 git remote -v 
+        3. 取消关联远程仓库 git remote remove 别名
+        4. 推送本地分支远程 git push 别名 本地分支名 -> 远程创建本地同名的分支  |  git push 别名 本地分支名:远程分支名
+        5. 拉取数据从远程库 git pull 别名 远程的分支名 -> 远程分支 merge -> 当前的本地分支  git merge 远程分支名
+        6. clone数据从远程 git clone 远程仓库地址  1. 关联远程仓库 2. pull拉取数据 (master数据)  -> 特别适合第一次加入
+
+   5.5 演示git远程命令 
+
+        组长-> 创建一个项目基本结构->推送到远程库! 
+           创建了项目
+           初始化了一些文件
+           关联远程仓库 git remote add  origin 远程仓库地址
+           推送数据远程 git push origin 本地分支名
+        组员-> 第一次 clone项目 
+           文件夹 / git bash 
+           git clone 远程仓库地址 1. 当前文件夹中再创建远程仓库同名的文件夹 2. 关联远程仓库 origin  3. 拉取master分支的数据
+
+        接到新的开发任务
+           develop拉取特性分支 git checkout -b feature/功能
+           完成分支任务开发和测试
+           将本地的特性分支推送到远程,并申请合并: git push origin feature/功能
+           团队管理  1. gitee / pull request 申请合并 2.自己拉倒本地检查合并推送develop 
+           大家要同步更新 develop 
+
+
+今日内容: 
+ 
+     1. 安装和配置      git config --global user.name user.email  git config --list 
+     2. 本地的基础命令  三个区域的轮转和版本查询和回滚 git init  status add commit diff 
+               log reflog -n --since --until = "ago" reset --hard --soft --mixed 
+     3. 分支相关命令 1. git branch checkout merge  2. 分支的命名规范 main develop feature 3. 分支流程[重点] 4. merge | merge --no-ff
+                    5. 冲突演示和解决 6. stash save -u  list apply pop drop clear 
+     4. 远程仓库  1. gitee创建好邮箱配置好 2. ssh公钥私钥配置好 3. 熟悉仓库创建和页面团队成员管理 4. git的远程命令 
+
+6. pycharm可视化操作(本地)
+   
+   6.1 pycharm先关联git的工具
+       file / settings  / version contorl / git  /  test => 版本输出
+   6.2 pycharm项目初始化(git init)
+       步骤1: version cotrol / create git repository / 当前项目文件夹 == git init -> 红色
+       步骤2: 添加到暂存区  项目 / 右键 / git  / add  -> 绿色
+       步骤3: 提交到版本库  项目 / --0-- / changs 修改的文件 / 提交描述 -> commit  or commit and push  -> 无色
+       步骤4: 添加新的文件  -> don`t ask again -> add 每次自动添加到暂存区 绿色
+       步骤5: 修改一个文件  -> 蓝色 -> 再次提交即可
+       步骤6: 删除一个文件  -> 灰突突的颜色 -> 再次提交即可
+   6.3 设置项目的忽略文件
+       git忽略配置: git默认管理的整个工作区的文件夹,但是有些文件无需git的管理!存在工作区! 只能写忽略配置,不去管理这些文件!
+       git如何配置忽略文件呢?
+           1. 项目级别的配置
+              工作的根地址 / .gitignore -> 忽略文件  .env / tests/
+              推荐使用插件:  file / settings / plugins / .ignore 
+              使用插件创建:  项目 / 右键 / new / .ignore / GIT / python -> .gitignore 
+           2. 电脑级别的配置 [不推荐]
+              任何位置创建 .gitignore -> 添加忽略文件 -> git的全局配置[~/.gitconfig]指定这个忽略文件(.gitignore) 
+              [core]
+              excludesfile = C:/Users/admin/.gitignore
+        注意1: 忽略文件应该早于被忽略文件创建才会生效,已经被git管理了忽略配置也是无效! [项目初始化完毕,应该创建忽略文件]
+        解决: 已经被管理的怎么忽略! 
+              1. 先取消git的管理 2. 添加到忽律文件 3. 再次提交自动忽律
+                 # 单个文件 
+                git rm --cached -f test.log #
+                文件夹加 -r 递归 
+                git rm -r --cached -f dist/ 
+   6.4 本地三个区域的轮转
+   6.5 本地分支操作
+   6.6 本地合并冲突和解决
+
+7. pycharm可视化操作(远程)
+   7.1 关联远程仓库
+        项目 / 右键 / git  / mange remotes / +  git@gitee.com:zhao-weifeng/pycharm_project_2.git
+   7.2 推送数据到远程
+        方式1: 提交版本的时候直接推送   commit and push 
+        方式2: 先提交版本 ->再推送      上方 -> 分支 -> push 
+   7.3 从远程clone 
+        方式1: git 命令 -> clone -> pycharm open 项目
+        方式2: --  -> git -> clone -> 输入地址
+   7.4 从远程Pull数据
+        选中当前分支 -> update -> pull 拉取和合并
