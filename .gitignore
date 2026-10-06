@@ -1,0 +1,16 @@
+# 忽略所有文件
+*
+
+# 但不忽略目录，否则无法进入子目录
+!*/
+
+# 保留 .gitignore 本身
+!.gitignore
+
+# 只保留这些扩展名的文件
+!*.md
+!*.docx
+!*.doc
+!*.png
+!*.pdf
+21-电商小二【环境搭建和API层开发】/customer_service/
